@@ -3,8 +3,26 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmbaSimpleClass", "AmbaSimpleClass\AmbaSimpleClass.csproj", "{E3A6D511-22C3-4B73-9B17-788617B2DE03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmbaConsoleApp", "AmbaConsoleApp\AmbaConsoleApp.csproj", "{CA5BF7AE-BFEC-47BB-9278-B1BD4BFBC38D}"
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CA5BF7AE-BFEC-47BB-9278-B1BD4BFBC38D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA5BF7AE-BFEC-47BB-9278-B1BD4BFBC38D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA5BF7AE-BFEC-47BB-9278-B1BD4BFBC38D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA5BF7AE-BFEC-47BB-9278-B1BD4BFBC38D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3A6D511-22C3-4B73-9B17-788617B2DE03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3A6D511-22C3-4B73-9B17-788617B2DE03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3A6D511-22C3-4B73-9B17-788617B2DE03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3A6D511-22C3-4B73-9B17-788617B2DE03}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 EndGlobal
