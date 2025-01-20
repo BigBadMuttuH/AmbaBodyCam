@@ -13,11 +13,16 @@ public class AmbaDevice : IDisposable
     private UsbDevice? _device;
     private UsbEndpointReader? _reader;
     private UsbEndpointWriter? _writer;
+    private Action<string> _logger;
 
-    public AmbaDevice()
+    /// <summary>
+    /// Конструктор с возможностью передать уровень логирования и кастомный логгер.
+    /// </summary>
+    public AmbaDevice(LogLevel logLevel = LogLevel.None, Action<string>? logger = null)
     {
         _context = new UsbContext();
-        // _context.SetDebugLevel(LogLevel.Debug);
+        _context.SetDebugLevel(logLevel);
+        _logger = logger ?? Console.WriteLine; // Если логгер не передан, используем Console.WriteLine
     }
 
     public void Dispose()
@@ -35,19 +40,19 @@ public class AmbaDevice : IDisposable
 
         if (_device == null)
         {
-            Console.WriteLine("❌ Устройство не найдено!");
+            _logger("❌ Устройство не найдено!");
             return false;
         }
 
         if (!_device.TryOpen())
         {
-            Console.WriteLine("⚠️ Не удалось открыть устройство.");
+            _logger("⚠️ Не удалось открыть устройство.");
             return false;
         }
 
-        Console.WriteLine("✅ Устройство подключено!");
-        Console.WriteLine($"🔍 Info: {_device.Info}");
-        Console.WriteLine($"🔌 LocationId: {_device.BusNumber}");
+        _logger("✅ Устройство подключено!");
+        _logger($"🔍 Info: {_device.Info}");
+        _logger($"🔌 LocationId: {_device.BusNumber}");
 
         // Проверяем наличие конфигурации и интерфейсов
         if (_device.Configs.Count > 0 && _device.Configs[0].Interfaces.Count > 0)
@@ -56,7 +61,7 @@ public class AmbaDevice : IDisposable
         }
         else
         {
-            Console.WriteLine("⚠️ Устройство не поддерживает конфигурацию интерфейса.");
+            _logger("⚠️ Устройство не поддерживает конфигурацию интерфейса.");
             return false;
         }
 
@@ -64,16 +69,16 @@ public class AmbaDevice : IDisposable
         _writer = _device.OpenEndpointWriter((WriteEndpointID)0x01);
         _reader = _device.OpenEndpointReader((ReadEndpointID)0x81);
 
-        Console.WriteLine("🔑 Входим на устройство...");
+        _logger("🔑 Входим на устройство...");
         var loginResponse = SendCommand("@Ver;8;00000000;#");
 
         if (!loginResponse.Contains("Ver;OK"))
         {
-            Console.WriteLine("❌ Ошибка авторизации! Устройство не отвечает.");
+            _logger("❌ Ошибка авторизации! Устройство не отвечает.");
             return false;
         }
 
-        Console.WriteLine("✅ Авторизация успешна!");
+        _logger("✅ Авторизация успешна!");
         return true;
     }
 
@@ -84,34 +89,34 @@ public class AmbaDevice : IDisposable
     {
         if (_writer == null || _reader == null)
         {
-            Console.WriteLine("⚠️ Нет соединения с устройством.");
+            _logger("⚠️ Нет соединения с устройством.");
             return string.Empty;
         }
 
-        Console.WriteLine($"📡 Отправка: {command}");
+        _logger($"📡 Отправка: {command}");
 
         var data = Encoding.ASCII.GetBytes(command);
         var writeStatus = _writer.Write(data, 3000, out var bytesWritten);
 
         if (writeStatus != Error.Success)
         {
-            Console.WriteLine($"❌ Ошибка записи: {writeStatus}");
+            _logger($"❌ Ошибка записи: {writeStatus}");
             return string.Empty;
         }
 
-        Console.WriteLine($"✅ Записано байт: {bytesWritten}");
+        _logger($"✅ Записано байт: {bytesWritten}");
 
         var readBuffer = new byte[64];
         var readStatus = _reader.Read(readBuffer, 3000, out var bytesRead);
 
         if (readStatus != Error.Success)
         {
-            Console.WriteLine($"❌ Ошибка чтения: {readStatus}");
+            _logger($"❌ Ошибка чтения: {readStatus}");
             return string.Empty;
         }
 
         var response = Encoding.ASCII.GetString(readBuffer, 0, bytesRead).Trim();
-        Console.WriteLine($"📩 Ответ: {response}");
+        _logger($"📩 Ответ: {response}");
 
         return response;
     }
@@ -125,10 +130,10 @@ public class AmbaDevice : IDisposable
         var date = now.ToString("yyyyMMdd"); // Год, месяц, день
         var time = now.ToString("HHmmss00"); // Часы, минуты, секунды + "00"
 
-        Console.WriteLine($"📅 Устанавливаем текущую дату: {date}");
+        _logger($"📅 Устанавливаем текущую дату: {date}");
         SendCommand($"@Sdt;8;{date};#");
 
-        Console.WriteLine($"⏰ Устанавливаем текущее время: {time}");
+        _logger($"⏰ Устанавливаем текущее время: {time}");
         SendCommand($"@Stm;6;{time};#");
     }
 
@@ -137,27 +142,27 @@ public class AmbaDevice : IDisposable
     /// </summary>
     public void EnterStorageMode()
     {
-        Console.WriteLine("🔄 Переводим в режим накопителя...");
+        _logger("🔄 Переводим в режим накопителя...");
         SendCommand("@ATH;8;12345678;#");
     }
-    
+
     /// <summary>
     /// Получает ID устройства
     /// </summary>
-    public string GetDeviceId()
+    public string? GetDeviceId()
     {
-        Console.WriteLine("🔎 Запрашиваем ID устройства...");
+        _logger("🔎 Запрашиваем ID устройства...");
         string response = SendCommand("@Gdv;8;12345678;#");
 
         if (response.StartsWith("@Gdv"))
         {
             string deviceId = response.Split(';')[2].Trim('#');
-            Console.WriteLine($"🆔 ID устройства: {deviceId}");
+            _logger($"🆔 ID устройства: {deviceId}");
             return deviceId;
         }
 
-        Console.WriteLine("⚠️ Ошибка получения ID.");
-        return string.Empty;
+        _logger("⚠️ Ошибка получения ID.");
+        return null;
     }
     
     /// <summary>
@@ -169,13 +174,13 @@ public class AmbaDevice : IDisposable
 
         if (string.IsNullOrEmpty(response) || response.Contains("ERROR"))
         {
-            Console.WriteLine("🔄 Устройство в режиме накопителя. Переключаем обратно...");
+            _logger("🔄 Устройство в режиме накопителя. Переключаем обратно...");
             SendCommand("@ATH;8;12345678;#");
             Thread.Sleep(2000);
         }
         else
         {
-            Console.WriteLine("✅ Устройство уже в рабочем режиме.");
+            _logger("✅ Устройство уже в рабочем режиме.");
         }
     }
 }

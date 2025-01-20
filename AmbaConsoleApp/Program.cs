@@ -1,4 +1,6 @@
 ﻿using AmbaSimpleClass;
+using LibUsbDotNet;
+using System.Text;
 
 namespace AmbaConsoleApp;
 
@@ -6,11 +8,10 @@ public static class Program
 {
     public static void Main(string[] args)
     {
-        AmbaDevice device = new AmbaDevice();
-        if(!device.Connect()) return;
-        device.GetDeviceId();
-        device.SetCurrentDateTime();
-        device.EnterStorageMode();
+        Console.OutputEncoding = Encoding.UTF8;
+
+        AmbaService service = new AmbaService();
+        service.Run();
     }
 }
 
