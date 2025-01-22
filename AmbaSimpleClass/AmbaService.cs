@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using LibUsbDotNet;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,18 +9,20 @@ namespace AmbaSimpleClass
     {
         private readonly AmbaSettings _settings;
         private readonly Action<string> _logger;
+        private readonly LogLevel _logLevel;
         private CancellationTokenSource? _cts;
 
-        public AmbaService(Action<string>? logger = null)
+        public AmbaService(Action<string>? logger = null, LogLevel logLevel = LogLevel.None)
         {
             _logger = logger ?? Console.WriteLine;
+            _logLevel = logLevel;
             _settings = AmbaSettings.Load();
         }
 
         public void Start()
         {
             _cts = new CancellationTokenSource();
-            Task.Run(() => Run(_cts.Token)); // Запускаем сервис в фоновом потоке
+            Task.Run(() => Run(_cts.Token));
         }
 
         public void Stop()
@@ -40,11 +42,11 @@ namespace AmbaSimpleClass
                 {
                     _logger($"⏳ Запуск синхронизации ({DateTime.Now:HH:mm:ss})");
 
-                    using AmbaDevice device = new AmbaDevice(logger: _logger);
+                    using AmbaDevice device = new AmbaDevice(_logLevel, _logger);
                     if (!device.Connect())
                     {
                         _logger("⚠️ Устройство не найдено. Повторная попытка через 5 минут...");
-                        WaitWithCancellation(TimeSpan.FromMinutes(5), token);
+                        Task.Delay(TimeSpan.FromMinutes(5), token).Wait(token);
                         continue;
                     }
 
@@ -52,12 +54,12 @@ namespace AmbaSimpleClass
                     if (deviceId == null)
                     {
                         _logger("❌ Не удалось получить ID устройства.");
-                        WaitWithCancellation(TimeSpan.FromMinutes(5), token);
+                        Task.Delay(TimeSpan.FromMinutes(5), token).Wait(token);
                         continue;
                     }
 
                     device.EnterStorageMode();
-                    WaitWithCancellation(TimeSpan.FromSeconds(5), token); // Ждём подключения в режиме накопителя
+                    Task.Delay(5000, token).Wait(token);
 
                     using AmbaStorage storage = new AmbaStorage(deviceId, _logger);
                     if (storage.CopyFiles(_settings.StoragePath, _settings.FileFormat))
@@ -70,26 +72,17 @@ namespace AmbaSimpleClass
                     }
 
                     _logger($"⏸ Ожидание {_settings.SyncIntervalMinutes} минут перед следующим запуском...");
-                    WaitWithCancellation(TimeSpan.FromMinutes(_settings.SyncIntervalMinutes), token);
+                    Task.Delay(TimeSpan.FromMinutes(_settings.SyncIntervalMinutes), token).Wait(token);
                 }
             }
             catch (TaskCanceledException)
             {
-                _logger("✅ Сервис остановлен (TaskCanceledException).");
+                _logger("✅ Сервис остановлен.");
             }
             catch (Exception ex)
             {
                 _logger($"❌ Ошибка в сервисе: {ex.Message}");
             }
-        }
-
-        private void WaitWithCancellation(TimeSpan delay, CancellationToken token)
-        {
-            try
-            {
-                Task.Delay(delay, token).Wait(token);
-            }
-            catch (TaskCanceledException) { }
         }
     }
 }

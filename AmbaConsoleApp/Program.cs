@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using AmbaSimpleClass;
+using LibUsbDotNet;
+using LibUsbDotNet.LibUsb;
 
 class Program
 {
@@ -8,7 +10,8 @@ class Program
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-        AmbaService service = new AmbaService(Console.WriteLine);
+        // Только консольное приложение использует LogLevel.Debug
+        AmbaService service = new AmbaService(Console.WriteLine, LogLevel.Debug);
 
         Console.CancelKeyPress += (sender, e) =>
         {
@@ -22,7 +25,7 @@ class Program
 
         while (true)
         {
-            Thread.Sleep(1000); // Держим приложение запущенным
+            Thread.Sleep(1000);
         }
     }
 }

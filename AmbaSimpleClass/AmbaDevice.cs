@@ -1,7 +1,7 @@
-﻿using System.Text;
-using LibUsbDotNet;
+﻿using LibUsbDotNet;
 using LibUsbDotNet.LibUsb;
 using LibUsbDotNet.Main;
+using System.Text;
 
 namespace AmbaSimpleClass;
 
@@ -11,18 +11,20 @@ public class AmbaDevice : IDisposable
     private const int ProductId = 0x0001;
     private readonly UsbContext _context;
     private UsbDevice? _device;
-    private UsbEndpointReader? _reader;
     private UsbEndpointWriter? _writer;
-    private Action<string> _logger;
+    private UsbEndpointReader? _reader;
+    private readonly Action<string> _logger;
 
     /// <summary>
     /// Конструктор с возможностью передать уровень логирования и кастомный логгер.
     /// </summary>
+
     public AmbaDevice(LogLevel logLevel = LogLevel.None, Action<string>? logger = null)
     {
+        _logger = logger ?? Console.WriteLine;
+
         _context = new UsbContext();
-        _context.SetDebugLevel(logLevel);
-        _logger = logger ?? Console.WriteLine; // Если логгер не передан, используем Console.WriteLine
+        _context.SetDebugLevel(logLevel); // Используем переданный уровень логирования
     }
 
     public void Dispose()
@@ -164,7 +166,7 @@ public class AmbaDevice : IDisposable
         _logger("⚠️ Ошибка получения ID.");
         return null;
     }
-    
+
     /// <summary>
     /// Переключает устройство в рабочий режим, если оно уже в режиме накопителя
     /// </summary>
