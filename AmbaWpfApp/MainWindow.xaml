@@ -3,47 +3,55 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Amba Sync" WindowState="Maximized" ResizeMode="NoResize"
         WindowStyle="None" Background="Black">
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="2*" />
-            <RowDefinition Height="2*" />
-            <RowDefinition Height="6*" />
+            <RowDefinition Height="8*" />
         </Grid.RowDefinitions>
 
-        <!-- Кнопка Старт -->
-        <Button x:Name="StartButton"
-            Content="▶️ СТАРТ"
-            FontSize="48"
-            Background="Green"
-            Foreground="White"
-            Click="StartButton_Click"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch"
-            Grid.Row="0"/>
+        <!-- Кнопки в ряд -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
 
-        <!-- Кнопка Остановить -->
-        <Button x:Name="StopButton"
-            Content="🛑 ОСТАНОВИТЬ"
-            FontSize="48"
-            Background="Red"
-            Foreground="White"
-            Click="StopButton_Click"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch"
-            Grid.Row="1"/>
+            <!-- Кнопка Старт -->
+            <Button x:Name="StartButton"
+                    Content="▶️ СТАРТ"
+                    FontSize="48"
+                    Background="Green"
+                    Foreground="White"
+                    Click="StartButton_Click"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Grid.Column="0" />
+
+            <!-- Кнопка Остановить -->
+            <Button x:Name="StopButton"
+                    Content="🛑 ОСТАНОВИТЬ"
+                    FontSize="48"
+                    Background="Red"
+                    Foreground="White"
+                    Click="StopButton_Click"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Grid.Column="1" />
+        </Grid>
 
         <!-- Окно логов -->
-        <ScrollViewer Grid.Row="2">
+        <ScrollViewer Grid.Row="1">
             <TextBox x:Name="LogText"
-                 FontSize="36"
-                 Foreground="White"
-                 Background="Black"
-                 TextWrapping="Wrap"
-                 Padding="20"
-                 IsReadOnly="True"
-                 AcceptsReturn="True"
-                 VerticalScrollBarVisibility="Auto"
-                 Text="Готов к запуску..." />
+                     FontSize="36"
+                     Foreground="White"
+                     Background="Black"
+                     TextWrapping="Wrap"
+                     Padding="20"
+                     IsReadOnly="True"
+                     AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Auto"
+                     Text="Готов к запуску..." />
         </ScrollViewer>
     </Grid>
 </Window>
