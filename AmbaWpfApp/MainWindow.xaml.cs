@@ -26,7 +26,7 @@ namespace AmbaWpfApp
             }
 
             _isRunning = true;
-            StartButton.Content = "🔄 ИДЁТ СИНХРОНИЗАЦИЯ...";
+            StartButton.Content = "🔄 СИНХРОНИЗАЦИЯ...";
             StartButton.Background = System.Windows.Media.Brushes.DarkGray;
 
             await Task.Run(() =>
