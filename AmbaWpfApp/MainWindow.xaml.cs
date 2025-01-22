@@ -54,6 +54,8 @@ namespace AmbaWpfApp
             Dispatcher.InvokeAsync(() =>
             {
                 LogText.AppendText($"\n{DateTime.Now:HH:mm:ss} {message}");
+
+                LogText.CaretIndex = LogText.Text.Length;
                 LogText.ScrollToEnd();
             }, DispatcherPriority.Render);
         }

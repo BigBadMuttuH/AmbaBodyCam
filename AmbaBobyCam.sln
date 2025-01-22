@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EC990C26-2FD7-4D6C-9B82-5DD4EB4EDB4F}"
 	ProjectSection(SolutionItems) = preProject
 		appsettings.json = appsettings.json
+		build.bat = build.bat
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmbaWpfApp", "AmbaWpfApp\AmbaWpfApp.csproj", "{A3B0B269-B922-492B-AC2C-6D6D47330B51}"
